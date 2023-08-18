@@ -1,12 +1,14 @@
-package router
+package test
 
 import (
+	router2 "Project2/Gin_first/router"
 	"bytes"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"strings"
 	"testing"
 )
 
@@ -44,11 +46,13 @@ import (
 	assert.Equal(t, "用户"+username+"年龄"+strconv.Itoa(age)+"已经存在", w.Body.String())
 }*/
 
+var router *gin.Engine
+
 func TestInitRouter(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	username := "tom"
-	router := InitRouter()
+	router := router2.InitRouter()
 
 	t.Run("index", func(t *testing.T) {
 		w := httptest.NewRecorder()
@@ -90,5 +94,14 @@ func TestUserPostForm(t *testing.T) {
 	value.Add("passwordAgain", "1234")
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/user/register", bytes.NewBufferString(value.Encode()))
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, strings.Contains(w.Body.String()))
 }
-func 
+func TestUserPostFormEmailErrorAndPasswordError(t *testing.T) {
+	value := url.Values{}
+	value.Add("email", "yangxhui")
+	value.Add("password", "1234")
+	value.Add("password-again", "qwer")
+
+}
